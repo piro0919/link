@@ -4,6 +4,7 @@ import { notFound, redirect } from "next/navigation";
 import type { ReactNode } from "react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { createClient } from "@/lib/supabase/server";
+import { CallButtons } from "./_components/call-buttons";
 import { MessageInput } from "./_components/message-input";
 import { MessageList } from "./_components/message-list";
 
@@ -73,6 +74,13 @@ export default async function ChatPage({ params }: ChatPageProps): Promise<React
               </AvatarFallback>
             </Avatar>
             <span className="font-medium">{otherUser.display_name}</span>
+            <div className="ml-auto">
+              <CallButtons
+                conversationId={conversationId}
+                remoteName={otherUser.display_name}
+                remoteAvatarUrl={otherUser.avatar_url}
+              />
+            </div>
           </>
         )}
       </header>
