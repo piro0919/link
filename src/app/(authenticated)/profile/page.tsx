@@ -23,7 +23,7 @@ export default async function ProfilePage(): Promise<ReactNode> {
 
   const { data: profile } = await supabase
     .from("profiles")
-    .select("display_name, avatar_url")
+    .select("display_name, avatar_url, link_id")
     .eq("id", user.sub)
     .single();
 
@@ -38,7 +38,11 @@ export default async function ProfilePage(): Promise<ReactNode> {
           <CardTitle>プロフィール</CardTitle>
         </CardHeader>
         <CardContent className="space-y-6">
-          <ProfileForm displayName={profile.display_name} avatarUrl={profile.avatar_url} />
+          <ProfileForm
+            displayName={profile.display_name}
+            avatarUrl={profile.avatar_url}
+            linkId={profile.link_id}
+          />
           <Separator />
           <form action={signOut}>
             <Button type="submit" variant="outline" className="w-full text-destructive">

@@ -5,3 +5,13 @@ export const updateProfileSchema = z.object({
 });
 
 export type UpdateProfileInput = z.infer<typeof updateProfileSchema>;
+
+export const updateLinkIdSchema = z.object({
+  linkId: z
+    .string()
+    .min(4, "Link IDは4文字以上にしてください")
+    .max(20, "Link IDは20文字以内にしてください")
+    .regex(/^[a-z0-9_-]+$/, "小文字英数字、ハイフン、アンダースコアのみ使用できます"),
+});
+
+export type UpdateLinkIdInput = z.infer<typeof updateLinkIdSchema>;
