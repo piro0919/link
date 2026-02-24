@@ -32,7 +32,7 @@ export default async function ProfilePage(): Promise<ReactNode> {
   }
 
   return (
-    <div className="flex min-h-svh items-start justify-center bg-background p-4 pt-12">
+    <div className="flex items-start justify-center p-4 pt-6">
       <Card className="w-full max-w-sm">
         <CardHeader>
           <CardTitle>プロフィール</CardTitle>
