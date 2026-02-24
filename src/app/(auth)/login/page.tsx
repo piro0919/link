@@ -2,6 +2,8 @@ import type { Metadata } from "next";
 import type { ReactNode } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Separator } from "@/components/ui/separator";
+import { DevLoginForm } from "./_components/dev-login-form";
 import { signInWithGoogle } from "./actions";
 
 export const metadata: Metadata = {
@@ -14,9 +16,9 @@ export default function LoginPage(): ReactNode {
       <Card className="w-full max-w-sm">
         <CardHeader className="text-center">
           <CardTitle className="text-2xl font-bold">Link</CardTitle>
-          <CardDescription>Googleアカウントでログイン</CardDescription>
+          <CardDescription>アカウントにログイン</CardDescription>
         </CardHeader>
-        <CardContent>
+        <CardContent className="space-y-4">
           <form action={signInWithGoogle}>
             <Button type="submit" variant="outline" className="w-full gap-2">
               <svg className="size-5" viewBox="0 0 24 24" aria-hidden="true">
@@ -40,6 +42,13 @@ export default function LoginPage(): ReactNode {
               Googleでログイン
             </Button>
           </form>
+
+          {process.env.NODE_ENV === "development" && (
+            <>
+              <Separator />
+              <DevLoginForm />
+            </>
+          )}
         </CardContent>
       </Card>
     </div>
