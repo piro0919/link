@@ -5,7 +5,8 @@
 INSERT INTO auth.users (
   id, instance_id, aud, role, email, encrypted_password,
   email_confirmed_at, raw_user_meta_data, created_at, updated_at,
-  confirmation_token, recovery_token
+  confirmation_token, recovery_token,
+  email_change, email_change_token_new, email_change_token_current, email_change_confirm_status
 ) VALUES (
   'a1111111-1111-1111-1111-111111111111',
   '00000000-0000-0000-0000-000000000000',
@@ -14,7 +15,7 @@ INSERT INTO auth.users (
   crypt('password123', gen_salt('bf')),
   NOW(),
   '{"full_name": "テスト太郎", "avatar_url": null}'::jsonb,
-  NOW(), NOW(), '', ''
+  NOW(), NOW(), '', '', '', '', '', 0
 );
 
 INSERT INTO auth.identities (
@@ -27,15 +28,15 @@ INSERT INTO auth.identities (
   'email', NOW(), NOW(), NOW()
 );
 
--- handle_new_user トリガーで profiles が自動作成される（link_id = 'a1111111'）
--- 分かりやすい link_id に更新
+-- handle_new_user トリガーで profiles が自動作成される
 UPDATE public.profiles SET link_id = 'taro' WHERE id = 'a1111111-1111-1111-1111-111111111111';
 
 -- ユーザー2: テスト花子 (hanako@example.com)
 INSERT INTO auth.users (
   id, instance_id, aud, role, email, encrypted_password,
   email_confirmed_at, raw_user_meta_data, created_at, updated_at,
-  confirmation_token, recovery_token
+  confirmation_token, recovery_token,
+  email_change, email_change_token_new, email_change_token_current, email_change_confirm_status
 ) VALUES (
   'b2222222-2222-2222-2222-222222222222',
   '00000000-0000-0000-0000-000000000000',
@@ -44,7 +45,7 @@ INSERT INTO auth.users (
   crypt('password123', gen_salt('bf')),
   NOW(),
   '{"full_name": "テスト花子", "avatar_url": null}'::jsonb,
-  NOW(), NOW(), '', ''
+  NOW(), NOW(), '', '', '', '', '', 0
 );
 
 INSERT INTO auth.identities (
@@ -57,5 +58,4 @@ INSERT INTO auth.identities (
   'email', NOW(), NOW(), NOW()
 );
 
--- link_id を分かりやすいものに更新
 UPDATE public.profiles SET link_id = 'hanako' WHERE id = 'b2222222-2222-2222-2222-222222222222';
