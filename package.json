@@ -26,6 +26,8 @@
     ]
   },
   "dependencies": {
+    "@skyway-sdk/room": "^2.4.1",
+    "@skyway-sdk/token": "^2.1.0",
     "@supabase/ssr": "^0.8.0",
     "@supabase/supabase-js": "^2.97.0",
     "@t3-oss/env-nextjs": "^0.13.10",
