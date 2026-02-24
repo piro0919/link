@@ -1,15 +1,13 @@
 import { createServerClient } from "@supabase/ssr";
 import { type NextRequest, NextResponse } from "next/server";
-import { env } from "@/env";
+import type { Database } from "./database.types";
 
 export async function updateSession(request: NextRequest): Promise<NextResponse> {
-  let supabaseResponse = NextResponse.next({
-    request,
-  });
+  let supabaseResponse = NextResponse.next({ request });
 
-  const supabase = createServerClient(
-    env.NEXT_PUBLIC_SUPABASE_URL,
-    env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY,
+  const supabase = createServerClient<Database>(
+    process.env.NEXT_PUBLIC_SUPABASE_URL ?? "",
+    process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY ?? "",
     {
       cookies: {
         getAll() {
@@ -19,9 +17,7 @@ export async function updateSession(request: NextRequest): Promise<NextResponse>
           for (const { name, value } of cookiesToSet) {
             request.cookies.set(name, value);
           }
-          supabaseResponse = NextResponse.next({
-            request,
-          });
+          supabaseResponse = NextResponse.next({ request });
           for (const { name, options, value } of cookiesToSet) {
             supabaseResponse.cookies.set(name, value, options);
           }
@@ -30,10 +26,11 @@ export async function updateSession(request: NextRequest): Promise<NextResponse>
     },
   );
 
-  // createServerClient と getClaims の間にコードを入れないこと
-  const { data } = await supabase.auth.getClaims();
-  const user = data?.claims;
+  // JWT署名を検証してトークンリフレッシュを行う
+  const { data: claimsData } = await supabase.auth.getClaims();
+  const user = claimsData?.claims;
 
+  // 未認証ユーザーをログインページにリダイレクト
   if (
     !user &&
     !request.nextUrl.pathname.startsWith("/login") &&
@@ -41,7 +38,6 @@ export async function updateSession(request: NextRequest): Promise<NextResponse>
   ) {
     const url = request.nextUrl.clone();
     url.pathname = "/login";
-
     return NextResponse.redirect(url);
   }
 
