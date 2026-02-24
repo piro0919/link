@@ -1,0 +1,3 @@
+-- Google OAuthユーザーはSupabase Auth経由で作成される
+-- handle_new_userトリガーが自動的にprofilesを作成する
+-- ローカルテスト: Supabase Studio (http://localhost:57423)
