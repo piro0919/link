@@ -81,13 +81,17 @@ src/
 │   │   ├── friends/          # フレンド一覧・検索・リクエスト
 │   │   └── profile/          # プロフィール表示・編集
 │   └── (chat)/               # チャットルート (フルスクリーン)
-│       └── chat/[conversationId]/  # リアルタイムチャット
+│       └── chat/[conversationId]/  # リアルタイムチャット + 通話
 ├── components/               # 共通コンポーネント
 │   └── ui/                   # shadcn/ui (自動生成、編集禁止)
 ├── env.ts                    # 環境変数定義（型安全）
 ├── proxy.ts                  # ミドルウェア（認証セッション管理）
 └── lib/
     ├── utils.ts              # cn()ヘルパー (shadcn)
+    ├── call/
+    │   ├── call-context.tsx   # 通話状態管理 Context (Realtime監視)
+    │   ├── call-overlay.tsx   # フルスクリーン通話UI (SkyWay P2P)
+    │   └── incoming-call-dialog.tsx  # 着信ダイアログ
     └── supabase/
         ├── client.ts         # ブラウザ用クライアント (Database型付き)
         ├── server.ts         # サーバー用クライアント (Database型付き)
@@ -194,6 +198,24 @@ const user = data?.claims;
 | created_at      | TIMESTAMPTZ | 送信日時              |
 
 - RLS: 参加者のみ参照可、自分のみ送信可
+- Realtime 有効
+
+### call_sessions テーブル
+
+| カラム          | 型          | 説明                                           |
+| --------------- | ----------- | ---------------------------------------------- |
+| id              | UUID (PK)   | セッションID                                   |
+| conversation_id | UUID (FK)   | → conversations(id)                            |
+| caller_id       | UUID (FK)   | 発信者 → profiles(id)                          |
+| callee_id       | UUID (FK)   | 着信者 → profiles(id)                          |
+| call_type       | TEXT        | audio / video                                  |
+| status          | TEXT        | ringing / accepted / rejected / ended / missed |
+| started_at      | TIMESTAMPTZ | 通話開始日時（accepted時に設定）               |
+| ended_at        | TIMESTAMPTZ | 通話終了日時                                   |
+| created_at      | TIMESTAMPTZ | 作成日時                                       |
+| updated_at      | TIMESTAMPTZ | 更新日時                                       |
+
+- RLS: caller/callee のみ参照・更新可、caller のみ INSERT（会話参加者チェック付き）
 - Realtime 有効
 
 ## 環境変数
