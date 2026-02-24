@@ -74,12 +74,14 @@ src/
 │   ├── (auth)/               # 未認証ルート
 │   │   ├── login/            # ログインページ (Google OAuth)
 │   │   └── auth/callback/    # OAuthコールバック
-│   └── (authenticated)/      # 認証済みルート
-│       ├── page.tsx          # ホーム (メッセージ一覧)
-│       └── profile/          # プロフィール表示・編集
-│           ├── _components/  # ページ固有コンポーネント
-│           ├── actions.ts    # Server Actions
-│           └── schema.ts     # Zodスキーマ
+│   ├── (authenticated)/      # 認証済みルート (ボトムナビ付き)
+│   │   ├── layout.tsx        # ボトムナビバー配置
+│   │   ├── _components/      # BottomNav
+│   │   ├── page.tsx          # ホーム (会話一覧)
+│   │   ├── friends/          # フレンド一覧・検索・リクエスト
+│   │   └── profile/          # プロフィール表示・編集
+│   └── (chat)/               # チャットルート (フルスクリーン)
+│       └── chat/[conversationId]/  # リアルタイムチャット
 ├── components/               # 共通コンポーネント
 │   └── ui/                   # shadcn/ui (自動生成、編集禁止)
 ├── env.ts                    # 環境変数定義（型安全）
@@ -87,8 +89,9 @@ src/
 └── lib/
     ├── utils.ts              # cn()ヘルパー (shadcn)
     └── supabase/
-        ├── client.ts         # ブラウザ用クライアント
-        ├── server.ts         # サーバー用クライアント
+        ├── client.ts         # ブラウザ用クライアント (Database型付き)
+        ├── server.ts         # サーバー用クライアント (Database型付き)
+        ├── database.types.ts # 自動生成DB型定義
         └── proxy.ts          # セッション更新（getClaims）
 ```
 
@@ -138,11 +141,60 @@ const user = data?.claims;
 | id           | UUID (PK/FK) | auth.users(id) への参照        |
 | display_name | TEXT          | 表示名（Google名から自動設定） |
 | avatar_url   | TEXT          | アバターURL（Google画像）     |
+| link_id      | TEXT (UNIQUE) | ユーザー検索用ID              |
 | created_at   | TIMESTAMPTZ  | 作成日時                       |
 | updated_at   | TIMESTAMPTZ  | 更新日時（自動更新）           |
 
-- `on_auth_user_created` トリガーで自動作成
+- `on_auth_user_created` トリガーで自動作成（link_id はUUID先頭8文字）
 - RLS: 認証済みユーザーは全参照可、更新は自分のみ
+
+### friend_requests テーブル
+
+| カラム      | 型           | 説明                              |
+| ----------- | ------------ | --------------------------------- |
+| id          | UUID (PK)    | リクエストID                      |
+| sender_id   | UUID (FK)    | 送信者 → profiles(id)             |
+| receiver_id | UUID (FK)    | 受信者 → profiles(id)             |
+| status      | TEXT          | pending / accepted / rejected     |
+| created_at  | TIMESTAMPTZ  | 作成日時                          |
+| updated_at  | TIMESTAMPTZ  | 更新日時                          |
+
+- UNIQUE(sender_id, receiver_id), CHECK(sender_id <> receiver_id)
+- RLS: 自分の送受信のみ参照、自分からのみ送信、受信者のみ更新
+- Realtime 有効
+
+### conversations テーブル
+
+| カラム     | 型          | 説明         |
+| ---------- | ----------- | ------------ |
+| id         | UUID (PK)   | 会話ID       |
+| created_at | TIMESTAMPTZ | 作成日時     |
+| updated_at | TIMESTAMPTZ | 更新日時     |
+
+- RLS: 参加者のみ参照・更新可
+
+### conversation_participants テーブル
+
+| カラム          | 型        | 説明                  |
+| --------------- | --------- | --------------------- |
+| conversation_id | UUID (FK) | → conversations(id)   |
+| user_id         | UUID (FK) | → profiles(id)        |
+
+- 複合PK (conversation_id, user_id)
+- RLS: 同じ会話の参加者のみ参照可
+
+### messages テーブル
+
+| カラム          | 型          | 説明                  |
+| --------------- | ----------- | --------------------- |
+| id              | UUID (PK)   | メッセージID          |
+| conversation_id | UUID (FK)   | → conversations(id)   |
+| sender_id       | UUID (FK)   | → profiles(id)        |
+| content         | TEXT        | メッセージ本文         |
+| created_at      | TIMESTAMPTZ | 送信日時              |
+
+- RLS: 参加者のみ参照可、自分のみ送信可
+- Realtime 有効
 
 ## 環境変数
 

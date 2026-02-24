@@ -2,12 +2,14 @@
   "$schema": "https://unpkg.com/knip@5/schema.json",
   "entry": ["src/app/**/page.tsx", "src/app/**/layout.tsx", "src/app/**/route.ts", "src/app/**/actions.ts"],
   "project": ["src/**/*.{ts,tsx}"],
-  "ignore": ["src/components/ui/**"],
+  "ignore": ["src/components/ui/**", "src/lib/supabase/database.types.ts"],
   "ignoreDependencies": [
     "@secretlint/secretlint-rule-preset-recommend",
     "better-typescript-lib",
     "postcss",
-    "tailwindcss"
+    "shadcn",
+    "tailwindcss",
+    "tw-animate-css"
   ],
   "ignoreExportsUsedInFile": true
 }
