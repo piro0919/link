@@ -69,23 +69,27 @@ pnpm db:start
 ```
 src/
 ├── app/
-│   ├── layout.tsx        # ルートレイアウト
-│   ├── page.tsx          # トップページ
-│   ├── globals.css       # グローバルCSS
-│   └── [feature]/        # 機能別ディレクトリ
-│       ├── _components/  # ページ固有コンポーネント
-│       ├── actions.ts    # Server Actions
-│       ├── schema.ts     # Zodスキーマ・型定義
-│       └── page.tsx      # ページコンポーネント
-├── components/           # 共通コンポーネント
-│   └── ui/               # shadcn/ui (自動生成、編集禁止)
-├── env.ts                # 環境変数定義（型安全）
-├── proxy.ts              # ミドルウェア（認証セッション管理）
+│   ├── layout.tsx            # ルートレイアウト (lang="ja")
+│   ├── globals.css           # グローバルCSS (shadcnテーマ変数含む)
+│   ├── (auth)/               # 未認証ルート
+│   │   ├── login/            # ログインページ (Google OAuth)
+│   │   └── auth/callback/    # OAuthコールバック
+│   └── (authenticated)/      # 認証済みルート
+│       ├── page.tsx          # ホーム (メッセージ一覧)
+│       └── profile/          # プロフィール表示・編集
+│           ├── _components/  # ページ固有コンポーネント
+│           ├── actions.ts    # Server Actions
+│           └── schema.ts     # Zodスキーマ
+├── components/               # 共通コンポーネント
+│   └── ui/                   # shadcn/ui (自動生成、編集禁止)
+├── env.ts                    # 環境変数定義（型安全）
+├── proxy.ts                  # ミドルウェア（認証セッション管理）
 └── lib/
-    └── supabase/         # Supabaseクライアント
-        ├── client.ts     # ブラウザ用クライアント
-        ├── server.ts     # サーバー用クライアント
-        └── proxy.ts      # セッション更新（getClaims）
+    ├── utils.ts              # cn()ヘルパー (shadcn)
+    └── supabase/
+        ├── client.ts         # ブラウザ用クライアント
+        ├── server.ts         # サーバー用クライアント
+        └── proxy.ts          # セッション更新（getClaims）
 ```
 
 ## Supabase クライアント
@@ -114,7 +118,31 @@ const supabase = createClient();
 ```typescript
 const { data } = await supabase.auth.getClaims();
 const user = data?.claims;
+// user.sub = ユーザーID (UUID)
 ```
+
+## 認証フロー
+
+- **認証方式**: Google OAuth のみ
+- **ログイン**: `/login` → Google OAuth → `/auth/callback` → `/`
+- **ログアウト**: `signOut()` Server Action → `/login`
+- **セッション管理**: `src/proxy.ts` が全リクエストで `getClaims()` を実行
+- **未認証時**: `/login` と `/auth/*` 以外は `/login` にリダイレクト
+
+## データベース
+
+### profiles テーブル
+
+| カラム       | 型           | 説明                           |
+| ------------ | ------------ | ------------------------------ |
+| id           | UUID (PK/FK) | auth.users(id) への参照        |
+| display_name | TEXT          | 表示名（Google名から自動設定） |
+| avatar_url   | TEXT          | アバターURL（Google画像）     |
+| created_at   | TIMESTAMPTZ  | 作成日時                       |
+| updated_at   | TIMESTAMPTZ  | 更新日時（自動更新）           |
+
+- `on_auth_user_created` トリガーで自動作成
+- RLS: 認証済みユーザーは全参照可、更新は自分のみ
 
 ## 環境変数
 
