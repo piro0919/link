@@ -38,7 +38,9 @@
     "radix-ui": "^1.4.3",
     "react": "19.2.3",
     "react-dom": "19.2.3",
+    "serwist": "^9.5.6",
     "tailwind-merge": "^3.5.0",
+    "web-push": "^3.6.7",
     "zod": "^4.3.6"
   },
   "devDependencies": {
@@ -46,11 +48,13 @@
     "@commitlint/cli": "^20.4.2",
     "@commitlint/config-conventional": "^20.4.2",
     "@secretlint/secretlint-rule-preset-recommend": "^11.3.1",
+    "@serwist/turbopack": "^9.5.6",
     "@tailwindcss/postcss": "^4",
     "@total-typescript/ts-reset": "^0.6.1",
     "@types/node": "^20",
     "@types/react": "^19",
     "@types/react-dom": "^19",
+    "@types/web-push": "^3.6.4",
     "babel-plugin-react-compiler": "1.0.0",
     "better-typescript-lib": "^2.12.0",
     "knip": "^5.85.0",
