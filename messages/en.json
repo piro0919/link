@@ -1,0 +1,107 @@
+{
+  "Metadata": {
+    "description": "A LINE-like messaging app"
+  },
+  "Login": {
+    "title": "Login",
+    "subtitle": "Sign in to your account",
+    "googleLogin": "Sign in with Google",
+    "devLogin": "Development Login",
+    "emailPlaceholder": "Email address",
+    "passwordPlaceholder": "Password",
+    "loginButton": "Login",
+    "invalidCredentials": "Invalid email address or password"
+  },
+  "Nav": {
+    "talk": "Chats",
+    "friends": "Friends",
+    "profile": "Profile"
+  },
+  "Theme": {
+    "label": "Theme",
+    "light": "Light",
+    "dark": "Dark",
+    "system": "Auto"
+  },
+  "Home": {
+    "title": "Chats",
+    "empty": "No chats yet. Add friends and start messaging."
+  },
+  "Friends": {
+    "title": "Friends",
+    "empty": "No friends yet. Search by Link ID to add friends.",
+    "requestsTitle": "Friend Requests",
+    "addFriend": "Add Friend",
+    "linkIdLabel": "Link ID",
+    "searchPlaceholder": "Enter Link ID",
+    "alreadyFriend": "Friend",
+    "alreadySent": "Sent",
+    "addButton": "Add",
+    "userNotFound": "User not found",
+    "alreadyRequested": "Request already sent",
+    "sendFailed": "Failed to send request",
+    "acceptFailed": "Failed to accept request",
+    "rejectFailed": "Failed to reject request",
+    "conversationFailed": "Failed to create conversation",
+    "validationEnterLinkId": "Please enter a Link ID",
+    "validationCheck": "Please check your input"
+  },
+  "Profile": {
+    "title": "Profile",
+    "displayName": "Display Name",
+    "save": "Save",
+    "profileUpdated": "Profile updated",
+    "profileUpdateFailed": "Failed to update profile",
+    "linkIdLabel": "Link ID",
+    "linkIdPlaceholder": "e.g. taro_123",
+    "linkIdHelp": "4-20 characters. Lowercase letters, numbers, hyphens, and underscores.",
+    "changeLinkId": "Change Link ID",
+    "linkIdUpdated": "Link ID updated",
+    "linkIdUpdateFailed": "Failed to update Link ID",
+    "linkIdTaken": "This Link ID is already taken",
+    "logout": "Logout",
+    "validationDisplayNameRequired": "Display name is required",
+    "validationDisplayNameMax": "Display name must be 50 characters or less",
+    "validationLinkIdMin": "Link ID must be at least 4 characters",
+    "validationLinkIdMax": "Link ID must be 20 characters or less",
+    "validationLinkIdPattern": "Only lowercase letters, numbers, hyphens, and underscores allowed",
+    "validationCheck": "Please check your input"
+  },
+  "Chat": {
+    "empty": "No messages yet",
+    "read": "Read",
+    "inputPlaceholder": "Type a message...",
+    "sendFailed": "Failed to send message",
+    "emptyMessage": "Please enter a message"
+  },
+  "Call": {
+    "videoCall": "Video call",
+    "audioCall": "Voice call",
+    "ringing": "Ringing...",
+    "connecting": "Connecting...",
+    "incoming": "Incoming...",
+    "notParticipant": "You are not a participant in this conversation",
+    "calleeNotFound": "Call recipient not found",
+    "alreadyInCall": "Already in a call",
+    "startFailed": "Failed to start call",
+    "answerFailed": "Failed to answer call",
+    "rejectFailed": "Failed to reject call",
+    "endFailed": "Failed to end call",
+    "tokenFailed": "Failed to get token",
+    "connectionFailed": "Failed to connect call",
+    "tapToAnswer": "Tap to answer",
+    "unknown": "Unknown",
+    "callFrom": "{callType} from {name}"
+  },
+  "Push": {
+    "fallbackNotification": "You have a new notification",
+    "fallbackMessage": "You have a new message"
+  },
+  "PWA": {
+    "install": "Install App",
+    "addToHomeScreen": "Add to Home Screen",
+    "iosDescription": "This website has app features. Add it to your home screen for fullscreen and offline use.",
+    "iosShareStep": "1) Tap the share icon (square with arrow).",
+    "iosAddStep": "2) Tap \"Add to Home Screen\"."
+  }
+}

@@ -1,0 +1,107 @@
+{
+  "Metadata": {
+    "description": "LINEライクなメッセージングアプリ"
+  },
+  "Login": {
+    "title": "ログイン",
+    "subtitle": "アカウントにログイン",
+    "googleLogin": "Googleでログイン",
+    "devLogin": "開発用ログイン",
+    "emailPlaceholder": "メールアドレス",
+    "passwordPlaceholder": "パスワード",
+    "loginButton": "ログイン",
+    "invalidCredentials": "メールアドレスまたはパスワードが正しくありません"
+  },
+  "Nav": {
+    "talk": "トーク",
+    "friends": "フレンド",
+    "profile": "プロフィール"
+  },
+  "Theme": {
+    "label": "テーマ",
+    "light": "ライト",
+    "dark": "ダーク",
+    "system": "自動"
+  },
+  "Home": {
+    "title": "トーク",
+    "empty": "トークはまだありません。フレンドを追加してメッセージを送りましょう。"
+  },
+  "Friends": {
+    "title": "フレンド",
+    "empty": "フレンドがまだいません。Link IDで検索して追加しましょう。",
+    "requestsTitle": "フレンドリクエスト",
+    "addFriend": "フレンドを追加",
+    "linkIdLabel": "Link ID",
+    "searchPlaceholder": "Link IDを入力",
+    "alreadyFriend": "フレンド",
+    "alreadySent": "送信済み",
+    "addButton": "追加",
+    "userNotFound": "ユーザーが見つかりませんでした",
+    "alreadyRequested": "既にリクエストを送信済みです",
+    "sendFailed": "リクエストの送信に失敗しました",
+    "acceptFailed": "リクエストの承認に失敗しました",
+    "rejectFailed": "リクエストの拒否に失敗しました",
+    "conversationFailed": "会話の作成に失敗しました",
+    "validationEnterLinkId": "Link IDを入力してください",
+    "validationCheck": "入力内容を確認してください"
+  },
+  "Profile": {
+    "title": "プロフィール",
+    "displayName": "表示名",
+    "save": "保存",
+    "profileUpdated": "プロフィールを更新しました",
+    "profileUpdateFailed": "プロフィールの更新に失敗しました",
+    "linkIdLabel": "Link ID",
+    "linkIdPlaceholder": "例: taro_123",
+    "linkIdHelp": "4〜20文字。小文字英数字、ハイフン、アンダースコアが使えます。",
+    "changeLinkId": "Link IDを変更",
+    "linkIdUpdated": "Link IDを更新しました",
+    "linkIdUpdateFailed": "Link IDの更新に失敗しました",
+    "linkIdTaken": "このLink IDは既に使用されています",
+    "logout": "ログアウト",
+    "validationDisplayNameRequired": "表示名は必須です",
+    "validationDisplayNameMax": "表示名は50文字以内にしてください",
+    "validationLinkIdMin": "Link IDは4文字以上にしてください",
+    "validationLinkIdMax": "Link IDは20文字以内にしてください",
+    "validationLinkIdPattern": "小文字英数字、ハイフン、アンダースコアのみ使用できます",
+    "validationCheck": "入力内容を確認してください"
+  },
+  "Chat": {
+    "empty": "メッセージはまだありません",
+    "read": "既読",
+    "inputPlaceholder": "メッセージを入力...",
+    "sendFailed": "メッセージの送信に失敗しました",
+    "emptyMessage": "メッセージを入力してください"
+  },
+  "Call": {
+    "videoCall": "ビデオ通話",
+    "audioCall": "音声通話",
+    "ringing": "呼び出し中...",
+    "connecting": "接続中...",
+    "incoming": "着信中...",
+    "notParticipant": "この会話に参加していません",
+    "calleeNotFound": "通話相手が見つかりません",
+    "alreadyInCall": "既に通話中です",
+    "startFailed": "通話の開始に失敗しました",
+    "answerFailed": "通話の応答に失敗しました",
+    "rejectFailed": "通話の拒否に失敗しました",
+    "endFailed": "通話の終了に失敗しました",
+    "tokenFailed": "トークンの取得に失敗しました",
+    "connectionFailed": "通話の接続に失敗しました",
+    "tapToAnswer": "タップして応答",
+    "unknown": "不明",
+    "callFrom": "{name}からの{callType}"
+  },
+  "Push": {
+    "fallbackNotification": "新しい通知があります",
+    "fallbackMessage": "新しいメッセージがあります"
+  },
+  "PWA": {
+    "install": "アプリをインストール",
+    "addToHomeScreen": "ホーム画面に追加",
+    "iosDescription": "このウェブサイトにはアプリ機能があります。ホーム画面に追加してフルスクリーンおよびオフラインで使用できます。",
+    "iosShareStep": "1) （四角から矢印が飛び出したマーク）をタップします。",
+    "iosAddStep": "2) 「ホーム画面に追加」をタップします。"
+  }
+}
