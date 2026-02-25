@@ -4,6 +4,7 @@ import type { ReactNode } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
+import { PwaInstallButton } from "@/lib/pwa/pwa-install-button";
 import { createClient } from "@/lib/supabase/server";
 import { ProfileForm } from "./_components/profile-form";
 import { signOut } from "./actions";
@@ -43,6 +44,7 @@ export default async function ProfilePage(): Promise<ReactNode> {
             avatarUrl={profile.avatar_url}
             linkId={profile.link_id}
           />
+          <PwaInstallButton />
           <Separator />
           <form action={signOut}>
             <Button type="submit" variant="outline" className="w-full text-destructive">
