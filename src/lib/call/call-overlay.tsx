@@ -5,7 +5,7 @@ import { type ReactNode, useCallback, useEffect, useRef, useState } from "react"
 import {
   endCall as endCallAction,
   generateSkyWayToken,
-} from "@/app/(chat)/chat/[conversationId]/call-actions";
+} from "@/app/[locale]/(chat)/chat/[conversationId]/call-actions";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { useCall } from "./call-context";

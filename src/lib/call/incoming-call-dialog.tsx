@@ -2,7 +2,7 @@
 
 import { Phone, PhoneOff, Video } from "lucide-react";
 import { type ReactNode, useCallback, useTransition } from "react";
-import { answerCall, rejectCall } from "@/app/(chat)/chat/[conversationId]/call-actions";
+import { answerCall, rejectCall } from "@/app/[locale]/(chat)/chat/[conversationId]/call-actions";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { useCall } from "./call-context";
