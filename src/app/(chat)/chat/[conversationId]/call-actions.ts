@@ -3,6 +3,7 @@
 import { nowInSec, SkyWayAuthToken, uuidV4 } from "@skyway-sdk/token";
 import { redirect } from "next/navigation";
 import { env } from "@/env";
+import { sendPushToUser } from "@/lib/push/send";
 import { createClient } from "@/lib/supabase/server";
 
 export async function generateSkyWayToken(
@@ -111,6 +112,20 @@ export async function startCall(
   if (error || !callSession) {
     return { error: "通話の開始に失敗しました" };
   }
+
+  // 着信プッシュ通知（fire-and-forget）
+  const { data: callerProfile } = await supabase
+    .from("profiles")
+    .select("display_name")
+    .eq("id", user.sub)
+    .single();
+
+  const callTypeLabel = callType === "video" ? "ビデオ通話" : "音声通話";
+  sendPushToUser(otherParticipant.user_id, {
+    title: `${callerProfile?.display_name ?? "Link"} からの${callTypeLabel}`,
+    body: "タップして応答",
+    url: `/chat/${conversationId}`,
+  }).catch(() => {});
 
   return { callSessionId: callSession.id };
 }

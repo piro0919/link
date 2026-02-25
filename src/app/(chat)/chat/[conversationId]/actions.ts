@@ -1,6 +1,7 @@
 "use server";
 
 import { redirect } from "next/navigation";
+import { sendPushToUser } from "@/lib/push/send";
 import { createClient } from "@/lib/supabase/server";
 
 export async function sendMessage(
@@ -35,6 +36,28 @@ export async function sendMessage(
     .from("conversations")
     .update({ updated_at: new Date().toISOString() })
     .eq("id", conversationId);
+
+  // プッシュ通知（fire-and-forget）
+  const { data: otherParticipant } = await supabase
+    .from("conversation_participants")
+    .select("user_id")
+    .eq("conversation_id", conversationId)
+    .neq("user_id", user.sub)
+    .single();
+
+  if (otherParticipant) {
+    const { data: senderProfile } = await supabase
+      .from("profiles")
+      .select("display_name")
+      .eq("id", user.sub)
+      .single();
+
+    sendPushToUser(otherParticipant.user_id, {
+      title: senderProfile?.display_name ?? "Link",
+      body: trimmed.length > 100 ? `${trimmed.slice(0, 100)}...` : trimmed,
+      url: `/chat/${conversationId}`,
+    }).catch(() => {});
+  }
 
   return {};
 }
