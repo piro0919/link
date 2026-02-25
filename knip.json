@@ -1,6 +1,6 @@
 {
   "$schema": "https://unpkg.com/knip@5/schema.json",
-  "entry": ["src/app/**/page.tsx", "src/app/**/layout.tsx", "src/app/**/route.ts", "src/app/**/actions.ts", "src/app/**/call-actions.ts"],
+  "entry": ["src/app/**/page.tsx", "src/app/**/layout.tsx", "src/app/**/route.ts", "src/app/**/actions.ts", "src/app/**/call-actions.ts", "src/app/sw.ts"],
   "project": ["src/**/*.{ts,tsx}"],
   "ignore": ["src/components/ui/**", "src/lib/supabase/database.types.ts"],
   "ignoreDependencies": [

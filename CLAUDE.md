@@ -92,6 +92,10 @@ src/
     │   ├── call-context.tsx   # 通話状態管理 Context (Realtime監視)
     │   ├── call-overlay.tsx   # フルスクリーン通話UI (SkyWay P2P)
     │   └── incoming-call-dialog.tsx  # 着信ダイアログ
+    ├── push/
+    │   ├── send.ts            # web-push 送信ユーティリティ
+    │   ├── actions.ts         # プッシュ購読管理 Server Actions
+    │   └── push-subscription-manager.tsx  # クライアント側購読登録
     └── supabase/
         ├── client.ts         # ブラウザ用クライアント (Database型付き)
         ├── server.ts         # サーバー用クライアント (Database型付き)
@@ -217,6 +221,22 @@ const user = data?.claims;
 
 - RLS: caller/callee のみ参照・更新可、caller のみ INSERT（会話参加者チェック付き）
 - Realtime 有効
+
+### push_subscriptions テーブル
+
+| カラム          | 型          | 説明                               |
+| --------------- | ----------- | ---------------------------------- |
+| id              | UUID (PK)   | サブスクリプションID               |
+| user_id         | UUID (FK)   | → profiles(id) ON DELETE CASCADE   |
+| endpoint        | TEXT        | Push API エンドポイントURL         |
+| p256dh          | TEXT        | 公開鍵                             |
+| auth            | TEXT        | 認証シークレット                   |
+| expiration_time | BIGINT      | 有効期限                           |
+| created_at      | TIMESTAMPTZ | 作成日時                           |
+| updated_at      | TIMESTAMPTZ | 更新日時                           |
+
+- UNIQUE(user_id, endpoint)（複数デバイス対応）
+- RLS: 自分のみ CRUD、同じ会話の参加者の subscription も SELECT 可
 
 ## 環境変数
 

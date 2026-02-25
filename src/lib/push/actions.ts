@@ -33,25 +33,3 @@ export async function subscribePush(subscription: {
 
   return {};
 }
-
-export async function unsubscribePush(endpoint: string): Promise<{ error?: string }> {
-  const supabase = await createClient();
-  const { data: claimsData } = await supabase.auth.getClaims();
-  const user = claimsData?.claims;
-
-  if (!user) {
-    redirect("/login");
-  }
-
-  const { error } = await supabase
-    .from("push_subscriptions")
-    .delete()
-    .eq("user_id", user.sub)
-    .eq("endpoint", endpoint);
-
-  if (error) {
-    return { error: "プッシュ通知の解除に失敗しました" };
-  }
-
-  return {};
-}
