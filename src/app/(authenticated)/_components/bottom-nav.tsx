@@ -12,7 +12,11 @@ const tabs = [
   { href: "/profile", label: "プロフィール", icon: User },
 ] as const;
 
-export function BottomNav(): ReactNode {
+type BottomNavProps = {
+  totalUnread: number;
+};
+
+export function BottomNav({ totalUnread }: BottomNavProps): ReactNode {
   const pathname = usePathname();
 
   return (
@@ -28,7 +32,14 @@ export function BottomNav(): ReactNode {
               isActive ? "text-primary" : "text-muted-foreground",
             )}
           >
-            <tab.icon className="size-5" />
+            <div className="relative">
+              <tab.icon className="size-5" />
+              {tab.href === "/" && totalUnread > 0 && (
+                <span className="absolute -top-1 -right-1.5 flex size-4 items-center justify-center rounded-full bg-destructive text-[9px] text-white">
+                  {totalUnread > 99 ? "99+" : totalUnread}
+                </span>
+              )}
+            </div>
             <span>{tab.label}</span>
           </Link>
         );

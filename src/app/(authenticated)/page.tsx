@@ -3,6 +3,7 @@ import Link from "next/link";
 import { redirect } from "next/navigation";
 import type { ReactNode } from "react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { Badge } from "@/components/ui/badge";
 import { createClient } from "@/lib/supabase/server";
 
 export const metadata: Metadata = {
@@ -68,6 +69,13 @@ export default async function HomePage(): Promise<ReactNode> {
     }
   }
 
+  // 未読数を取得
+  const { data: unreadCounts } = await supabase.rpc("get_unread_counts");
+  const unreadMap = new Map<string, number>();
+  for (const row of unreadCounts ?? []) {
+    unreadMap.set(row.conversation_id, Number(row.unread_count));
+  }
+
   // 会話ごとの相手プロフィール
   const participantMap = new Map<string, { displayName: string; avatarUrl: string | null }>();
   for (const p of participants ?? []) {
@@ -117,9 +125,22 @@ export default async function HomePage(): Promise<ReactNode> {
                     </span>
                   )}
                 </div>
-                {latest && (
-                  <p className="text-sm text-muted-foreground truncate">{latest.content}</p>
-                )}
+                <div className="flex items-center gap-2">
+                  {latest && (
+                    <p className="min-w-0 flex-1 truncate text-sm text-muted-foreground">
+                      {latest.content}
+                    </p>
+                  )}
+                  {(() => {
+                    const count = unreadMap.get(conv.id);
+                    if (!count) return null;
+                    return (
+                      <Badge className="flex size-5 shrink-0 items-center justify-center p-0 text-[10px]">
+                        {count > 99 ? "99+" : count}
+                      </Badge>
+                    );
+                  })()}
+                </div>
               </div>
             </Link>
           );
