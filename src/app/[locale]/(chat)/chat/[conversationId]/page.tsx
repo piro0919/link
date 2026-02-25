@@ -1,8 +1,9 @@
 import { ArrowLeft } from "lucide-react";
-import Link from "next/link";
 import { notFound, redirect } from "next/navigation";
+import { setRequestLocale } from "next-intl/server";
 import type { ReactNode } from "react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { Link } from "@/i18n/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { CallButtons } from "./_components/call-buttons";
 import { MessageInput } from "./_components/message-input";
@@ -10,11 +11,12 @@ import { MessageList } from "./_components/message-list";
 import { markAsRead } from "./actions";
 
 type ChatPageProps = {
-  params: Promise<{ conversationId: string }>;
+  params: Promise<{ conversationId: string; locale: string }>;
 };
 
 export default async function ChatPage({ params }: ChatPageProps): Promise<ReactNode> {
-  const { conversationId } = await params;
+  const { conversationId, locale } = await params;
+  setRequestLocale(locale);
   const supabase = await createClient();
   const { data: claimsData } = await supabase.auth.getClaims();
   const user = claimsData?.claims;

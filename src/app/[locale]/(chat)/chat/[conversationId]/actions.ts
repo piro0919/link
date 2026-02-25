@@ -1,6 +1,7 @@
 "use server";
 
 import { redirect } from "next/navigation";
+import { getTranslations } from "next-intl/server";
 import { sendPushToUser } from "@/lib/push/send";
 import { createClient } from "@/lib/supabase/server";
 
@@ -9,6 +10,7 @@ export async function sendMessage(
   content: string,
 ): Promise<{ error?: string }> {
   const supabase = await createClient();
+  const t = await getTranslations("Chat");
   const { data: claimsData } = await supabase.auth.getClaims();
   const user = claimsData?.claims;
 
@@ -18,7 +20,7 @@ export async function sendMessage(
 
   const trimmed = content.trim();
   if (!trimmed) {
-    return { error: "メッセージを入力してください" };
+    return { error: t("emptyMessage") };
   }
 
   const { error: msgError } = await supabase.from("messages").insert({
@@ -28,7 +30,7 @@ export async function sendMessage(
   });
 
   if (msgError) {
-    return { error: "メッセージの送信に失敗しました" };
+    return { error: t("sendFailed") };
   }
 
   // conversations.updated_at を更新（ソート用）

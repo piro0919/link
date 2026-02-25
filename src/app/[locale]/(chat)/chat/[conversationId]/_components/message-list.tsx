@@ -1,5 +1,6 @@
 "use client";
 
+import { useTranslations } from "next-intl";
 import { type ReactNode, useEffect, useRef, useState } from "react";
 import { createClient } from "@/lib/supabase/client";
 import { cn } from "@/lib/utils";
@@ -19,16 +20,12 @@ type MessageListProps = {
   initialMessages: Message[];
 };
 
-function formatTime(dateStr: string): string {
-  const date = new Date(dateStr);
-  return date.toLocaleTimeString("ja-JP", { hour: "2-digit", minute: "2-digit" });
-}
-
 export function MessageList({
   conversationId,
   currentUserId,
   initialMessages,
 }: MessageListProps): ReactNode {
+  const t = useTranslations("Chat");
   const [messages, setMessages] = useState<Message[]>(initialMessages);
   const bottomRef = useRef<HTMLDivElement>(null);
 
@@ -95,7 +92,7 @@ export function MessageList({
   if (messages.length === 0) {
     return (
       <div className="flex flex-1 items-center justify-center">
-        <p className="text-muted-foreground">メッセージはまだありません</p>
+        <p className="text-muted-foreground">{t("empty")}</p>
       </div>
     );
   }
@@ -127,8 +124,13 @@ export function MessageList({
               {msg.content}
             </div>
             <div className="mt-0.5 flex items-center gap-1">
-              {showRead && <span className="text-[10px] text-muted-foreground">既読</span>}
-              <span className="text-[10px] text-muted-foreground">{formatTime(msg.createdAt)}</span>
+              {showRead && <span className="text-[10px] text-muted-foreground">{t("read")}</span>}
+              <span className="text-[10px] text-muted-foreground">
+                {new Date(msg.createdAt).toLocaleTimeString([], {
+                  hour: "2-digit",
+                  minute: "2-digit",
+                })}
+              </span>
             </div>
           </div>
         );

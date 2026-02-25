@@ -1,6 +1,7 @@
 "use client";
 
 import { Loader2, Send } from "lucide-react";
+import { useTranslations } from "next-intl";
 import { type ReactNode, useRef, useState, useTransition } from "react";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
@@ -11,6 +12,7 @@ type MessageInputProps = {
 };
 
 export function MessageInput({ conversationId }: MessageInputProps): ReactNode {
+  const t = useTranslations("Chat");
   const [value, setValue] = useState("");
   const [isPending, startTransition] = useTransition();
   const textareaRef = useRef<HTMLTextAreaElement>(null);
@@ -42,7 +44,7 @@ export function MessageInput({ conversationId }: MessageInputProps): ReactNode {
         value={value}
         onChange={(e) => setValue(e.target.value)}
         onKeyDown={handleKeyDown}
-        placeholder="メッセージを入力..."
+        placeholder={t("inputPlaceholder")}
         rows={1}
         className="min-h-10 max-h-32 resize-none"
       />
