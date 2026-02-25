@@ -185,6 +185,7 @@ export type Database = {
           conversation_id: string;
           created_at: string;
           id: string;
+          read_at: string | null;
           sender_id: string;
         };
         Insert: {
@@ -192,6 +193,7 @@ export type Database = {
           conversation_id: string;
           created_at?: string;
           id?: string;
+          read_at?: string | null;
           sender_id: string;
         };
         Update: {
@@ -199,6 +201,7 @@ export type Database = {
           conversation_id?: string;
           created_at?: string;
           id?: string;
+          read_at?: string | null;
           sender_id?: string;
         };
         Relationships: [
@@ -292,6 +295,13 @@ export type Database = {
     };
     Functions: {
       get_my_conversation_ids: { Args: never; Returns: string[] };
+      get_unread_counts: {
+        Args: never;
+        Returns: {
+          conversation_id: string;
+          unread_count: number;
+        }[];
+      };
     };
     Enums: {
       [_ in never]: never;

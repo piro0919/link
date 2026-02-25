@@ -76,9 +76,9 @@ INSERT INTO public.conversation_participants (conversation_id, user_id) VALUES
   ('c3333333-3333-3333-3333-333333333333', 'b2222222-2222-2222-2222-222222222222');
 
 -- サンプルメッセージ
-INSERT INTO public.messages (conversation_id, sender_id, content, created_at) VALUES
-  ('c3333333-3333-3333-3333-333333333333', 'a1111111-1111-1111-1111-111111111111', 'こんにちは！', NOW() - INTERVAL '2 minutes'),
-  ('c3333333-3333-3333-3333-333333333333', 'b2222222-2222-2222-2222-222222222222', 'やっほー！元気？', NOW() - INTERVAL '1 minute'),
-  ('c3333333-3333-3333-3333-333333333333', 'a1111111-1111-1111-1111-111111111111', 'うん、元気だよ！', NOW());
+INSERT INTO public.messages (conversation_id, sender_id, content, created_at, read_at) VALUES
+  ('c3333333-3333-3333-3333-333333333333', 'a1111111-1111-1111-1111-111111111111', 'こんにちは！', NOW() - INTERVAL '2 minutes', NOW() - INTERVAL '1 minute'),
+  ('c3333333-3333-3333-3333-333333333333', 'b2222222-2222-2222-2222-222222222222', 'やっほー！元気？', NOW() - INTERVAL '1 minute', NOW()),
+  ('c3333333-3333-3333-3333-333333333333', 'a1111111-1111-1111-1111-111111111111', 'うん、元気だよ！', NOW(), NULL);
 
 UPDATE public.conversations SET updated_at = NOW() WHERE id = 'c3333333-3333-3333-3333-333333333333';
