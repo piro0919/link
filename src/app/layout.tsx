@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import type { ReactNode } from "react";
+import { ThemeProvider } from "@/components/theme-provider";
 import { CallProvider } from "@/lib/call/call-context";
 import { CallOverlay } from "@/lib/call/call-overlay";
 import { IncomingCallDialog } from "@/lib/call/incoming-call-dialog";
@@ -32,11 +33,13 @@ export default function RootLayout({
   return (
     <html lang="ja" suppressHydrationWarning>
       <body className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
-        <CallProvider>
-          {children}
-          <CallOverlay />
-          <IncomingCallDialog />
-        </CallProvider>
+        <ThemeProvider>
+          <CallProvider>
+            {children}
+            <CallOverlay />
+            <IncomingCallDialog />
+          </CallProvider>
+        </ThemeProvider>
       </body>
     </html>
   );

@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { redirect } from "next/navigation";
 import type { ReactNode } from "react";
+import { ThemeToggle } from "@/components/theme-toggle";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
@@ -45,6 +46,8 @@ export default async function ProfilePage(): Promise<ReactNode> {
             linkId={profile.link_id}
           />
           <PwaInstallButton />
+          <Separator />
+          <ThemeToggle />
           <Separator />
           <form action={signOut}>
             <Button type="submit" variant="outline" className="w-full text-destructive">
