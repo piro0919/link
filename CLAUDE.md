@@ -12,6 +12,7 @@
 - **リンター/フォーマッター**: Biome
 - **バックエンド**: Supabase (Auth, PostgreSQL, Realtime)
 - **通話**: SkyWay (音声/ビデオ通話)
+- **i18n**: next-intl（en/ja、localePrefix: "as-needed"）
 - **環境変数**: @t3-oss/env-nextjs（型安全）
 - **デプロイ**: Vercel
 - **パッケージマネージャー**: pnpm
@@ -69,25 +70,35 @@ pnpm db:start
 ```
 src/
 ├── app/
-│   ├── layout.tsx            # ルートレイアウト (lang="ja")
+│   ├── layout.tsx            # ルートレイアウト (CSS import + pass-through)
 │   ├── globals.css           # グローバルCSS (shadcnテーマ変数含む)
-│   ├── (auth)/               # 未認証ルート
-│   │   ├── login/            # ログインページ (Google OAuth)
-│   │   └── auth/callback/    # OAuthコールバック
-│   ├── (authenticated)/      # 認証済みルート (ボトムナビ付き)
-│   │   ├── layout.tsx        # ボトムナビバー配置
-│   │   ├── _components/      # BottomNav
-│   │   ├── page.tsx          # ホーム (会話一覧)
-│   │   ├── friends/          # フレンド一覧・検索・リクエスト
-│   │   └── profile/          # プロフィール表示・編集
-│   └── (chat)/               # チャットルート (フルスクリーン)
-│       └── chat/[conversationId]/  # リアルタイムチャット + 通話
+│   ├── [locale]/             # next-intl ロケールセグメント
+│   │   ├── layout.tsx        # ロケールレイアウト (html lang, NextIntlClientProvider)
+│   │   ├── (auth)/           # 未認証ルート
+│   │   │   ├── login/        # ログインページ (Google OAuth)
+│   │   │   └── auth/callback/ # OAuthコールバック
+│   │   ├── (authenticated)/  # 認証済みルート (ボトムナビ付き)
+│   │   │   ├── layout.tsx    # ボトムナビバー配置
+│   │   │   ├── _components/  # BottomNav
+│   │   │   ├── page.tsx      # ホーム (会話一覧)
+│   │   │   ├── friends/      # フレンド一覧・検索・リクエスト
+│   │   │   └── profile/      # プロフィール表示・編集
+│   │   └── (chat)/           # チャットルート (フルスクリーン)
+│   │       └── chat/[conversationId]/  # リアルタイムチャット + 通話
+│   ├── manifest.ts           # PWA マニフェスト
+│   ├── sw.ts                 # Service Worker (Serwist)
+│   ├── robots.ts             # robots.txt 動的生成
+│   └── sitemap.ts            # sitemap.xml 動的生成
+├── i18n/
+│   ├── routing.ts            # defineRouting (en/ja, localePrefix: "as-needed")
+│   ├── request.ts            # getRequestConfig (メッセージ読み込み)
+│   └── navigation.ts         # createNavigation (Link, redirect, usePathname)
 ├── components/               # 共通コンポーネント
 │   ├── theme-provider.tsx    # next-themes ダークモード対応
 │   ├── theme-toggle.tsx      # テーマ切替UI（ライト/ダーク/自動）
 │   └── ui/                   # shadcn/ui (自動生成、編集禁止)
 ├── env.ts                    # 環境変数定義（型安全）
-├── proxy.ts                  # ミドルウェア（認証セッション管理）
+├── proxy.ts                  # ミドルウェア（Supabase認証 + next-intl）
 └── lib/
     ├── utils.ts              # cn()ヘルパー (shadcn)
     ├── call/
@@ -105,7 +116,11 @@ src/
         ├── client.ts         # ブラウザ用クライアント (Database型付き)
         ├── server.ts         # サーバー用クライアント (Database型付き)
         ├── database.types.ts # 自動生成DB型定義
-        └── proxy.ts          # セッション更新（getClaims）
+        └── proxy.ts          # セッション更新 + ロケール対応リダイレクト
+
+messages/
+├── en.json                   # 英語翻訳 (デフォルト)
+└── ja.json                   # 日本語翻訳
 ```
 
 ## Supabase クライアント
@@ -142,8 +157,8 @@ const user = data?.claims;
 - **認証方式**: Google OAuth のみ
 - **ログイン**: `/login` → Google OAuth → `/auth/callback` → `/`
 - **ログアウト**: `signOut()` Server Action → `/login`
-- **セッション管理**: `src/proxy.ts` が全リクエストで `getClaims()` を実行
-- **未認証時**: `/login` と `/auth/*` 以外は `/login` にリダイレクト
+- **セッション管理**: `src/proxy.ts` が Supabase認証 + next-intl ミドルウェアを合成
+- **未認証時**: `/login` と `/auth/*` 以外は `/login` にリダイレクト（ロケールプレフィックス対応）
 
 ## データベース
 
@@ -281,6 +296,56 @@ NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY=your-anon-key
 ### 関数
 
 - `_` で始まる引数は未使用として許容される
+
+## i18n (国際化)
+
+- **ライブラリ**: next-intl
+- **対応言語**: `en` (デフォルト), `ja`
+- **ロケールプレフィックス**: `as-needed`（英語はプレフィックスなし、日本語は `/ja/...`）
+- **翻訳ファイル**: `messages/en.json`, `messages/ja.json`
+
+### サーバーコンポーネント
+
+```typescript
+import { getTranslations, setRequestLocale } from "next-intl/server";
+
+export default async function Page({ params }: { params: Promise<{ locale: string }> }) {
+  const { locale } = await params;
+  setRequestLocale(locale);
+  const t = await getTranslations("Namespace");
+  return <p>{t("key")}</p>;
+}
+```
+
+### クライアントコンポーネント (i18n)
+
+```typescript
+import { useTranslations } from "next-intl";
+
+export function Component() {
+  const t = useTranslations("Namespace");
+  return <p>{t("key")}</p>;
+}
+```
+
+### Server Actions
+
+```typescript
+import { getTranslations } from "next-intl/server";
+
+export async function myAction() {
+  const t = await getTranslations("Namespace");
+  return { error: t("errorKey") };
+}
+```
+
+### ナビゲーション
+
+クライアントコンポーネントでは `next/link` ではなく `@/i18n/navigation` の `Link` を使用:
+
+```typescript
+import { Link, usePathname, useRouter } from "@/i18n/navigation";
+```
 
 ## Git フック
 
