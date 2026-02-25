@@ -2,6 +2,7 @@
 
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
+import { getTranslations } from "next-intl/server";
 import { createClient } from "@/lib/supabase/server";
 import { updateLinkIdSchema, updateProfileSchema } from "./schema";
 
@@ -15,6 +16,7 @@ export async function updateProfile(
   formData: FormData,
 ): Promise<ProfileState> {
   const supabase = await createClient();
+  const t = await getTranslations("Profile");
   const { data: claimsData } = await supabase.auth.getClaims();
   const user = claimsData?.claims;
 
@@ -28,7 +30,7 @@ export async function updateProfile(
 
   if (!parsed.success) {
     return {
-      error: parsed.error.issues[0]?.message || "入力内容を確認してください",
+      error: t("validationCheck"),
     };
   }
 
@@ -38,7 +40,7 @@ export async function updateProfile(
     .eq("id", user.sub);
 
   if (error) {
-    return { error: "プロフィールの更新に失敗しました" };
+    return { error: t("profileUpdateFailed") };
   }
 
   revalidatePath("/profile");
@@ -55,6 +57,7 @@ export async function updateLinkId(
   formData: FormData,
 ): Promise<LinkIdState> {
   const supabase = await createClient();
+  const t = await getTranslations("Profile");
   const { data: claimsData } = await supabase.auth.getClaims();
   const user = claimsData?.claims;
 
@@ -68,7 +71,7 @@ export async function updateLinkId(
 
   if (!parsed.success) {
     return {
-      error: parsed.error.issues[0]?.message || "入力内容を確認してください",
+      error: t("validationCheck"),
     };
   }
 
@@ -79,9 +82,9 @@ export async function updateLinkId(
 
   if (error) {
     if (error.code === "23505") {
-      return { error: "このLink IDは既に使用されています" };
+      return { error: t("linkIdTaken") };
     }
-    return { error: "Link IDの更新に失敗しました" };
+    return { error: t("linkIdUpdateFailed") };
   }
 
   revalidatePath("/profile");

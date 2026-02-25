@@ -1,6 +1,7 @@
 "use client";
 
 import { Loader2 } from "lucide-react";
+import { useTranslations } from "next-intl";
 import { type ReactNode, useActionState } from "react";
 import { useFormStatus } from "react-dom";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
@@ -29,6 +30,7 @@ const profileInitialState: ProfileState = {};
 const linkIdInitialState: LinkIdState = {};
 
 export function ProfileForm({ avatarUrl, displayName, linkId }: ProfileFormProps): ReactNode {
+  const t = useTranslations("Profile");
   const [profileState, profileAction] = useActionState(updateProfile, profileInitialState);
   const [linkIdState, linkIdAction] = useActionState(updateLinkId, linkIdInitialState);
 
@@ -43,7 +45,7 @@ export function ProfileForm({ avatarUrl, displayName, linkId }: ProfileFormProps
         </div>
 
         <div className="space-y-2">
-          <Label htmlFor="displayName">表示名</Label>
+          <Label htmlFor="displayName">{t("displayName")}</Label>
           <Input
             id="displayName"
             name="displayName"
@@ -55,17 +57,17 @@ export function ProfileForm({ avatarUrl, displayName, linkId }: ProfileFormProps
 
         {profileState.error && <p className="text-sm text-destructive">{profileState.error}</p>}
         {profileState.success && (
-          <p className="text-sm text-muted-foreground">プロフィールを更新しました</p>
+          <p className="text-sm text-muted-foreground">{t("profileUpdated")}</p>
         )}
 
-        <SubmitButton label="保存" />
+        <SubmitButton label={t("save")} />
       </form>
 
       <Separator />
 
       <form action={linkIdAction} className="space-y-4">
         <div className="space-y-2">
-          <Label htmlFor="linkId">Link ID</Label>
+          <Label htmlFor="linkId">{t("linkIdLabel")}</Label>
           <Input
             id="linkId"
             name="linkId"
@@ -74,19 +76,17 @@ export function ProfileForm({ avatarUrl, displayName, linkId }: ProfileFormProps
             minLength={4}
             maxLength={20}
             pattern="[a-z0-9_-]+"
-            placeholder="例: taro_123"
+            placeholder={t("linkIdPlaceholder")}
           />
-          <p className="text-xs text-muted-foreground">
-            4〜20文字。小文字英数字、ハイフン、アンダースコアが使えます。
-          </p>
+          <p className="text-xs text-muted-foreground">{t("linkIdHelp")}</p>
         </div>
 
         {linkIdState.error && <p className="text-sm text-destructive">{linkIdState.error}</p>}
         {linkIdState.success && (
-          <p className="text-sm text-muted-foreground">Link IDを更新しました</p>
+          <p className="text-sm text-muted-foreground">{t("linkIdUpdated")}</p>
         )}
 
-        <SubmitButton label="Link IDを変更" />
+        <SubmitButton label={t("changeLinkId")} />
       </form>
     </div>
   );
