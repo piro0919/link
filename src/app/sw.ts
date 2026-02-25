@@ -68,7 +68,7 @@ self.addEventListener("push", (event) => {
     if (!event.data) {
       await self.registration.showNotification("Link", {
         badge: "/icon-192.png",
-        body: "新しい通知があります",
+        body: "You have a new notification",
         icon: "/icon-192.png",
       });
       return;
@@ -92,7 +92,7 @@ self.addEventListener("push", (event) => {
     } catch {
       await self.registration.showNotification("Link", {
         badge: "/icon-192.png",
-        body: "新しいメッセージがあります",
+        body: "You have a new message",
         icon: "/icon-192.png",
       });
     }

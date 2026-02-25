@@ -1,6 +1,7 @@
 "use client";
 
 import { Loader2, Mic, MicOff, PhoneOff, Video, VideoOff } from "lucide-react";
+import { useTranslations } from "next-intl";
 import { type ReactNode, useCallback, useEffect, useRef, useState } from "react";
 import {
   endCall as endCallAction,
@@ -17,6 +18,7 @@ function formatElapsed(seconds: number): string {
 }
 
 export function CallOverlay(): ReactNode {
+  const t = useTranslations("Call");
   const { callState, currentUserId, clearCall } = useCall();
   const [isMuted, setIsMuted] = useState(false);
   const [isCameraOff, setIsCameraOff] = useState(false);
@@ -76,7 +78,7 @@ export function CallOverlay(): ReactNode {
           session.callSessionId,
         );
         if (tokenResult.error || !tokenResult.token) {
-          setError(tokenResult.error ?? "トークンの取得に失敗しました");
+          setError(tokenResult.error ?? t("tokenFailed"));
           return;
         }
 
@@ -155,7 +157,7 @@ export function CallOverlay(): ReactNode {
         });
       } catch (e) {
         if (!disposed) {
-          setError("通話の接続に失敗しました");
+          setError(t("connectionFailed"));
           // biome-ignore lint/suspicious/noConsole: useful for debugging SkyWay errors
           console.error("SkyWay connection error:", e);
         }
@@ -236,11 +238,11 @@ export function CallOverlay(): ReactNode {
               </AvatarFallback>
             </Avatar>
             <p className="text-xl font-medium">{callState.remoteName}</p>
-            {isRinging && <p className="text-sm text-zinc-400">呼び出し中...</p>}
+            {isRinging && <p className="text-sm text-zinc-400">{t("ringing")}</p>}
             {isConnecting && !isRinging && (
               <div className="flex items-center gap-2 text-sm text-zinc-400">
                 <Loader2 className="size-4 animate-spin" />
-                接続中...
+                {t("connecting")}
               </div>
             )}
             {error && <p className="text-sm text-red-400">{error}</p>}

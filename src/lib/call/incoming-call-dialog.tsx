@@ -1,6 +1,7 @@
 "use client";
 
 import { Phone, PhoneOff, Video } from "lucide-react";
+import { useTranslations } from "next-intl";
 import { type ReactNode, useCallback, useTransition } from "react";
 import { answerCall, rejectCall } from "@/app/[locale]/(chat)/chat/[conversationId]/call-actions";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
@@ -8,6 +9,7 @@ import { Button } from "@/components/ui/button";
 import { useCall } from "./call-context";
 
 export function IncomingCallDialog(): ReactNode {
+  const t = useTranslations("Call");
   const { callState, updateCallStatus, clearCall } = useCall();
   const [isPending, startTransition] = useTransition();
 
@@ -50,9 +52,9 @@ export function IncomingCallDialog(): ReactNode {
           <p className="text-lg font-medium">{callState.remoteName}</p>
           <div className="mt-1 flex items-center justify-center gap-1 text-sm text-zinc-400">
             {isVideo ? <Video className="size-4" /> : <Phone className="size-4" />}
-            {isVideo ? "ビデオ通話" : "音声通話"}
+            {isVideo ? t("videoCall") : t("audioCall")}
           </div>
-          <p className="mt-2 animate-pulse text-sm text-zinc-400">着信中...</p>
+          <p className="mt-2 animate-pulse text-sm text-zinc-400">{t("incoming")}</p>
         </div>
 
         <div className="flex gap-8">

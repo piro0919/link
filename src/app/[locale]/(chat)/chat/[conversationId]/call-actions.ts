@@ -2,6 +2,7 @@
 
 import { nowInSec, SkyWayAuthToken, uuidV4 } from "@skyway-sdk/token";
 import { redirect } from "next/navigation";
+import { getTranslations } from "next-intl/server";
 import { env } from "@/env";
 import { sendPushToUser } from "@/lib/push/send";
 import { createClient } from "@/lib/supabase/server";
@@ -11,6 +12,7 @@ export async function generateSkyWayToken(
   callSessionId: string,
 ): Promise<{ token: string; error?: never } | { token?: never; error: string }> {
   const supabase = await createClient();
+  const t = await getTranslations("Call");
   const { data: claimsData } = await supabase.auth.getClaims();
   const user = claimsData?.claims;
 
@@ -26,7 +28,7 @@ export async function generateSkyWayToken(
     .single();
 
   if (!participant) {
-    return { error: "この会話に参加していません" };
+    return { error: t("notParticipant") };
   }
 
   const roomName = `call_${conversationId}_${callSessionId}`;
@@ -66,6 +68,7 @@ export async function startCall(
   callType: "audio" | "video",
 ): Promise<{ callSessionId: string; error?: never } | { callSessionId?: never; error: string }> {
   const supabase = await createClient();
+  const t = await getTranslations("Call");
   const { data: claimsData } = await supabase.auth.getClaims();
   const user = claimsData?.claims;
 
@@ -81,7 +84,7 @@ export async function startCall(
     .single();
 
   if (!otherParticipant) {
-    return { error: "通話相手が見つかりません" };
+    return { error: t("calleeNotFound") };
   }
 
   // アクティブな通話がないか確認
@@ -94,7 +97,7 @@ export async function startCall(
     .maybeSingle();
 
   if (activeCall) {
-    return { error: "既に通話中です" };
+    return { error: t("alreadyInCall") };
   }
 
   const { data: callSession, error } = await supabase
@@ -110,7 +113,7 @@ export async function startCall(
     .single();
 
   if (error || !callSession) {
-    return { error: "通話の開始に失敗しました" };
+    return { error: t("startFailed") };
   }
 
   // 着信プッシュ通知（fire-and-forget）
@@ -120,10 +123,11 @@ export async function startCall(
     .eq("id", user.sub)
     .single();
 
-  const callTypeLabel = callType === "video" ? "ビデオ通話" : "音声通話";
+  const callTypeLabel = callType === "video" ? t("videoCall") : t("audioCall");
+  const callerName = callerProfile?.display_name ?? t("unknown");
   sendPushToUser(otherParticipant.user_id, {
-    title: `${callerProfile?.display_name ?? "Link"} からの${callTypeLabel}`,
-    body: "タップして応答",
+    title: t("callFrom", { callType: callTypeLabel, name: callerName }),
+    body: t("tapToAnswer"),
     url: `/chat/${conversationId}`,
   }).catch(() => {});
 
@@ -132,6 +136,7 @@ export async function startCall(
 
 export async function answerCall(callSessionId: string): Promise<{ error?: string }> {
   const supabase = await createClient();
+  const t = await getTranslations("Call");
   const { data: claimsData } = await supabase.auth.getClaims();
   const user = claimsData?.claims;
 
@@ -147,7 +152,7 @@ export async function answerCall(callSessionId: string): Promise<{ error?: strin
     .eq("status", "ringing");
 
   if (error) {
-    return { error: "通話の応答に失敗しました" };
+    return { error: t("answerFailed") };
   }
 
   return {};
@@ -155,6 +160,7 @@ export async function answerCall(callSessionId: string): Promise<{ error?: strin
 
 export async function rejectCall(callSessionId: string): Promise<{ error?: string }> {
   const supabase = await createClient();
+  const t = await getTranslations("Call");
   const { data: claimsData } = await supabase.auth.getClaims();
   const user = claimsData?.claims;
 
@@ -170,7 +176,7 @@ export async function rejectCall(callSessionId: string): Promise<{ error?: strin
     .eq("status", "ringing");
 
   if (error) {
-    return { error: "通話の拒否に失敗しました" };
+    return { error: t("rejectFailed") };
   }
 
   return {};
@@ -178,6 +184,7 @@ export async function rejectCall(callSessionId: string): Promise<{ error?: strin
 
 export async function endCall(callSessionId: string): Promise<{ error?: string }> {
   const supabase = await createClient();
+  const t = await getTranslations("Call");
   const { data: claimsData } = await supabase.auth.getClaims();
   const user = claimsData?.claims;
 
@@ -192,7 +199,7 @@ export async function endCall(callSessionId: string): Promise<{ error?: string }
     .or(`caller_id.eq.${user.sub},callee_id.eq.${user.sub}`);
 
   if (error) {
-    return { error: "通話の終了に失敗しました" };
+    return { error: t("endFailed") };
   }
 
   return {};
