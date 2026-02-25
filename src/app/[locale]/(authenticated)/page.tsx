@@ -1,16 +1,25 @@
 import type { Metadata } from "next";
-import Link from "next/link";
 import { redirect } from "next/navigation";
+import { getLocale, getTranslations, setRequestLocale } from "next-intl/server";
 import type { ReactNode } from "react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
+import { Link } from "@/i18n/navigation";
 import { createClient } from "@/lib/supabase/server";
 
-export const metadata: Metadata = {
-  title: "トーク",
-};
+export async function generateMetadata(): Promise<Metadata> {
+  const t = await getTranslations("Home");
+  return { title: t("title") };
+}
 
-export default async function HomePage(): Promise<ReactNode> {
+export default async function HomePage({
+  params,
+}: {
+  params: Promise<{ locale: string }>;
+}): Promise<ReactNode> {
+  const { locale } = await params;
+  setRequestLocale(locale);
+  const t = await getTranslations("Home");
   const supabase = await createClient();
   const { data: claimsData } = await supabase.auth.getClaims();
   const user = claimsData?.claims;
@@ -30,10 +39,8 @@ export default async function HomePage(): Promise<ReactNode> {
   if (conversationIds.length === 0) {
     return (
       <div className="flex flex-col gap-4 p-4">
-        <h1 className="text-xl font-bold">トーク</h1>
-        <p className="py-8 text-center text-muted-foreground">
-          トークはまだありません。フレンドを追加してメッセージを送りましょう。
-        </p>
+        <h1 className="text-xl font-bold">{t("title")}</h1>
+        <p className="py-8 text-center text-muted-foreground">{t("empty")}</p>
       </div>
     );
   }
@@ -87,19 +94,22 @@ export default async function HomePage(): Promise<ReactNode> {
     }
   }
 
+  const currentLocale = await getLocale();
+  const dateLocale = currentLocale === "ja" ? "ja-JP" : "en-US";
+
   function formatDate(dateStr: string): string {
     const date = new Date(dateStr);
     const now = new Date();
     const isToday = date.toDateString() === now.toDateString();
     if (isToday) {
-      return date.toLocaleTimeString("ja-JP", { hour: "2-digit", minute: "2-digit" });
+      return date.toLocaleTimeString(dateLocale, { hour: "2-digit", minute: "2-digit" });
     }
-    return date.toLocaleDateString("ja-JP", { month: "short", day: "numeric" });
+    return date.toLocaleDateString(dateLocale, { month: "short", day: "numeric" });
   }
 
   return (
     <div className="flex flex-col gap-2 p-4">
-      <h1 className="text-xl font-bold">トーク</h1>
+      <h1 className="text-xl font-bold">{t("title")}</h1>
       <div className="divide-y">
         {conversations?.map((conv) => {
           const other = participantMap.get(conv.id);

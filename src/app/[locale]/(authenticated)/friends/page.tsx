@@ -1,17 +1,26 @@
 import type { Metadata } from "next";
-import Link from "next/link";
 import { redirect } from "next/navigation";
+import { getTranslations, setRequestLocale } from "next-intl/server";
 import type { ReactNode } from "react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { Link } from "@/i18n/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { AddFriendDialog } from "./_components/add-friend-dialog";
 import { FriendRequestList } from "./_components/friend-request-list";
 
-export const metadata: Metadata = {
-  title: "フレンド",
-};
+export async function generateMetadata(): Promise<Metadata> {
+  const t = await getTranslations("Friends");
+  return { title: t("title") };
+}
 
-export default async function FriendsPage(): Promise<ReactNode> {
+export default async function FriendsPage({
+  params,
+}: {
+  params: Promise<{ locale: string }>;
+}): Promise<ReactNode> {
+  const { locale } = await params;
+  setRequestLocale(locale);
+  const t = await getTranslations("Friends");
   const supabase = await createClient();
   const { data: claimsData } = await supabase.auth.getClaims();
   const user = claimsData?.claims;
@@ -83,16 +92,14 @@ export default async function FriendsPage(): Promise<ReactNode> {
   return (
     <div className="flex flex-col gap-4 p-4">
       <div className="flex items-center justify-between">
-        <h1 className="text-xl font-bold">フレンド</h1>
+        <h1 className="text-xl font-bold">{t("title")}</h1>
         <AddFriendDialog />
       </div>
 
       <FriendRequestList requests={requests} />
 
       {friends.length === 0 ? (
-        <p className="py-8 text-center text-muted-foreground">
-          フレンドがまだいません。Link IDで検索して追加しましょう。
-        </p>
+        <p className="py-8 text-center text-muted-foreground">{t("empty")}</p>
       ) : (
         <div className="divide-y">
           {friends.map((friend) => {

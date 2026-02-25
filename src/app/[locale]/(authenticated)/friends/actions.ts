@@ -2,6 +2,7 @@
 
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
+import { getTranslations } from "next-intl/server";
 import { createClient } from "@/lib/supabase/server";
 import { searchLinkIdSchema } from "./schema";
 
@@ -23,6 +24,7 @@ export async function searchByLinkId(
   formData: FormData,
 ): Promise<SearchState> {
   const supabase = await createClient();
+  const t = await getTranslations("Friends");
   const { data: claimsData } = await supabase.auth.getClaims();
   const user = claimsData?.claims;
 
@@ -36,7 +38,7 @@ export async function searchByLinkId(
 
   if (!parsed.success) {
     return {
-      error: parsed.error.issues[0]?.message || "入力内容を確認してください",
+      error: t("validationEnterLinkId"),
     };
   }
 
@@ -48,7 +50,7 @@ export async function searchByLinkId(
     .single();
 
   if (!profile) {
-    return { error: "ユーザーが見つかりませんでした" };
+    return { error: t("userNotFound") };
   }
 
   // 既存のフレンドリクエストを確認
@@ -74,6 +76,7 @@ export async function searchByLinkId(
 
 export async function sendFriendRequest(receiverId: string): Promise<{ error?: string }> {
   const supabase = await createClient();
+  const t = await getTranslations("Friends");
   const { data: claimsData } = await supabase.auth.getClaims();
   const user = claimsData?.claims;
 
@@ -88,9 +91,9 @@ export async function sendFriendRequest(receiverId: string): Promise<{ error?: s
 
   if (error) {
     if (error.code === "23505") {
-      return { error: "既にリクエストを送信済みです" };
+      return { error: t("alreadyRequested") };
     }
-    return { error: "リクエストの送信に失敗しました" };
+    return { error: t("sendFailed") };
   }
 
   revalidatePath("/friends");
@@ -99,6 +102,7 @@ export async function sendFriendRequest(receiverId: string): Promise<{ error?: s
 
 export async function acceptFriendRequest(requestId: string): Promise<{ error?: string }> {
   const supabase = await createClient();
+  const t = await getTranslations("Friends");
   const { data: claimsData } = await supabase.auth.getClaims();
   const user = claimsData?.claims;
 
@@ -117,7 +121,7 @@ export async function acceptFriendRequest(requestId: string): Promise<{ error?: 
     .single();
 
   if (updateError || !request) {
-    return { error: "リクエストの承認に失敗しました" };
+    return { error: t("acceptFailed") };
   }
 
   // 1:1 会話を作成
@@ -128,7 +132,7 @@ export async function acceptFriendRequest(requestId: string): Promise<{ error?: 
     .single();
 
   if (convError || !conversation) {
-    return { error: "会話の作成に失敗しました" };
+    return { error: t("conversationFailed") };
   }
 
   // 参加者を追加
@@ -138,7 +142,7 @@ export async function acceptFriendRequest(requestId: string): Promise<{ error?: 
   ]);
 
   if (partError) {
-    return { error: "会話の作成に失敗しました" };
+    return { error: t("conversationFailed") };
   }
 
   revalidatePath("/friends");
@@ -147,6 +151,7 @@ export async function acceptFriendRequest(requestId: string): Promise<{ error?: 
 
 export async function rejectFriendRequest(requestId: string): Promise<{ error?: string }> {
   const supabase = await createClient();
+  const t = await getTranslations("Friends");
   const { data: claimsData } = await supabase.auth.getClaims();
   const user = claimsData?.claims;
 
@@ -162,7 +167,7 @@ export async function rejectFriendRequest(requestId: string): Promise<{ error?: 
     .eq("status", "pending");
 
   if (error) {
-    return { error: "リクエストの拒否に失敗しました" };
+    return { error: t("rejectFailed") };
   }
 
   revalidatePath("/friends");

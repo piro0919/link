@@ -1,6 +1,7 @@
 "use client";
 
 import { Check, Loader2, X } from "lucide-react";
+import { useTranslations } from "next-intl";
 import { type ReactNode, useTransition } from "react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
@@ -63,13 +64,15 @@ function RequestItem({ request }: { request: FriendRequest }): ReactNode {
 }
 
 export function FriendRequestList({ requests }: FriendRequestListProps): ReactNode {
+  const t = useTranslations("Friends");
+
   if (requests.length === 0) {
     return null;
   }
 
   return (
     <div className="space-y-2">
-      <h3 className="text-sm font-medium text-muted-foreground">フレンドリクエスト</h3>
+      <h3 className="text-sm font-medium text-muted-foreground">{t("requestsTitle")}</h3>
       <div className="divide-y">
         {requests.map((request) => (
           <RequestItem key={request.id} request={request} />

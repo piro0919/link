@@ -1,6 +1,7 @@
 "use client";
 
 import { Loader2, Search, UserPlus } from "lucide-react";
+import { useTranslations } from "next-intl";
 import { type ReactNode, useActionState, useState, useTransition } from "react";
 import { useFormStatus } from "react-dom";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
@@ -28,6 +29,7 @@ function SearchButton(): ReactNode {
 const initialState: SearchState = {};
 
 export function AddFriendDialog(): ReactNode {
+  const t = useTranslations("Friends");
   const [state, formAction] = useActionState(searchByLinkId, initialState);
   const [sendError, setSendError] = useState<string>();
   const [sent, setSent] = useState(false);
@@ -62,13 +64,18 @@ export function AddFriendDialog(): ReactNode {
       </DialogTrigger>
       <DialogContent className="max-w-sm">
         <DialogHeader>
-          <DialogTitle>フレンドを追加</DialogTitle>
+          <DialogTitle>{t("addFriend")}</DialogTitle>
         </DialogHeader>
 
         <form action={formAction} className="flex items-end gap-2">
           <div className="flex-1 space-y-2">
-            <Label htmlFor="search-link-id">Link ID</Label>
-            <Input id="search-link-id" name="linkId" placeholder="Link IDを入力" required />
+            <Label htmlFor="search-link-id">{t("linkIdLabel")}</Label>
+            <Input
+              id="search-link-id"
+              name="linkId"
+              placeholder={t("searchPlaceholder")}
+              required
+            />
           </div>
           <SearchButton />
         </form>
@@ -86,12 +93,12 @@ export function AddFriendDialog(): ReactNode {
               <p className="text-sm text-muted-foreground">@{result.linkId}</p>
             </div>
             {alreadyFriend ? (
-              <span className="text-sm text-muted-foreground">フレンド</span>
+              <span className="text-sm text-muted-foreground">{t("alreadyFriend")}</span>
             ) : alreadySent ? (
-              <span className="text-sm text-muted-foreground">送信済み</span>
+              <span className="text-sm text-muted-foreground">{t("alreadySent")}</span>
             ) : (
               <Button size="sm" onClick={() => handleSend(result.id)} disabled={isPending}>
-                {isPending ? <Loader2 className="size-4 animate-spin" /> : "追加"}
+                {isPending ? <Loader2 className="size-4 animate-spin" /> : t("addButton")}
               </Button>
             )}
           </div>

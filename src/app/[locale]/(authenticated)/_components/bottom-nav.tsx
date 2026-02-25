@@ -1,23 +1,24 @@
 "use client";
 
 import { MessageCircle, User, Users } from "lucide-react";
-import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { useTranslations } from "next-intl";
 import type { ReactNode } from "react";
+import { Link, usePathname } from "@/i18n/navigation";
 import { cn } from "@/lib/utils";
-
-const tabs = [
-  { href: "/", label: "トーク", icon: MessageCircle },
-  { href: "/friends", label: "フレンド", icon: Users },
-  { href: "/profile", label: "プロフィール", icon: User },
-] as const;
 
 type BottomNavProps = {
   totalUnread: number;
 };
 
 export function BottomNav({ totalUnread }: BottomNavProps): ReactNode {
+  const t = useTranslations("Nav");
   const pathname = usePathname();
+
+  const tabs = [
+    { href: "/" as const, label: t("talk"), icon: MessageCircle },
+    { href: "/friends" as const, label: t("friends"), icon: Users },
+    { href: "/profile" as const, label: t("profile"), icon: User },
+  ];
 
   return (
     <nav className="flex border-t bg-background">
