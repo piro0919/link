@@ -3,12 +3,14 @@
 import { type ReactNode, useEffect, useRef, useState } from "react";
 import { createClient } from "@/lib/supabase/client";
 import { cn } from "@/lib/utils";
+import { markAsRead } from "../actions";
 
 type Message = {
   id: string;
   senderId: string;
   content: string;
   createdAt: string;
+  readAt: string | null;
 };
 
 type MessageListProps = {
@@ -56,12 +58,31 @@ export function MessageList({
             senderId: payload.new.sender_id,
             content: payload.new.content,
             createdAt: payload.new.created_at,
+            readAt: payload.new.read_at,
           };
           setMessages((prev) => {
             // 重複防止
             if (prev.some((m) => m.id === newMsg.id)) return prev;
             return [...prev, newMsg];
           });
+          // 相手のメッセージをリアルタイム受信時に即既読
+          if (newMsg.senderId !== currentUserId) {
+            markAsRead(conversationId);
+          }
+        },
+      )
+      .on(
+        "postgres_changes",
+        {
+          event: "UPDATE",
+          schema: "public",
+          table: "messages",
+          filter: `conversation_id=eq.${conversationId}`,
+        },
+        (payload) => {
+          setMessages((prev) =>
+            prev.map((m) => (m.id === payload.new.id ? { ...m, readAt: payload.new.read_at } : m)),
+          );
         },
       )
       .subscribe();
@@ -69,7 +90,7 @@ export function MessageList({
     return () => {
       supabase.removeChannel(channel);
     };
-  }, [conversationId]);
+  }, [conversationId, currentUserId]);
 
   if (messages.length === 0) {
     return (
@@ -79,10 +100,16 @@ export function MessageList({
     );
   }
 
+  // 自分の最後の既読メッセージのインデックスを取得（LINE準拠）
+  const lastReadOwnMsgIndex = messages.findLastIndex(
+    (m) => m.senderId === currentUserId && m.readAt !== null,
+  );
+
   return (
     <div className="flex flex-1 flex-col gap-1 overflow-y-auto p-4">
-      {messages.map((msg) => {
+      {messages.map((msg, index) => {
         const isOwn = msg.senderId === currentUserId;
+        const showRead = isOwn && index === lastReadOwnMsgIndex;
         return (
           <div
             key={msg.id}
@@ -99,9 +126,10 @@ export function MessageList({
             >
               {msg.content}
             </div>
-            <span className="mt-0.5 text-[10px] text-muted-foreground">
-              {formatTime(msg.createdAt)}
-            </span>
+            <div className="mt-0.5 flex items-center gap-1">
+              {showRead && <span className="text-[10px] text-muted-foreground">既読</span>}
+              <span className="text-[10px] text-muted-foreground">{formatTime(msg.createdAt)}</span>
+            </div>
           </div>
         );
       })}

@@ -7,6 +7,7 @@ import { createClient } from "@/lib/supabase/server";
 import { CallButtons } from "./_components/call-buttons";
 import { MessageInput } from "./_components/message-input";
 import { MessageList } from "./_components/message-list";
+import { markAsRead } from "./actions";
 
 type ChatPageProps = {
   params: Promise<{ conversationId: string }>;
@@ -34,6 +35,9 @@ export default async function ChatPage({ params }: ChatPageProps): Promise<React
     notFound();
   }
 
+  // 相手からの未読メッセージを既読にする
+  await markAsRead(conversationId);
+
   // 相手のプロフィール取得
   const { data: otherParticipants } = await supabase
     .from("conversation_participants")
@@ -46,7 +50,7 @@ export default async function ChatPage({ params }: ChatPageProps): Promise<React
   // メッセージ取得
   const { data: messagesData } = await supabase
     .from("messages")
-    .select("id, sender_id, content, created_at")
+    .select("id, sender_id, content, created_at, read_at")
     .eq("conversation_id", conversationId)
     .order("created_at", { ascending: true });
 
@@ -56,6 +60,7 @@ export default async function ChatPage({ params }: ChatPageProps): Promise<React
       senderId: m.sender_id,
       content: m.content,
       createdAt: m.created_at,
+      readAt: m.read_at,
     })) ?? [];
 
   return (

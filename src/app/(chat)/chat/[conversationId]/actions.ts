@@ -61,3 +61,21 @@ export async function sendMessage(
 
   return {};
 }
+
+export async function markAsRead(conversationId: string): Promise<void> {
+  const supabase = await createClient();
+  const { data: claimsData } = await supabase.auth.getClaims();
+  const user = claimsData?.claims;
+
+  if (!user) {
+    redirect("/login");
+  }
+
+  // 相手からの未読メッセージを一括既読にする
+  await supabase
+    .from("messages")
+    .update({ read_at: new Date().toISOString() })
+    .eq("conversation_id", conversationId)
+    .neq("sender_id", user.sub)
+    .is("read_at", null);
+}
