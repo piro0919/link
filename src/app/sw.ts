@@ -61,3 +61,63 @@ const serwist = new Serwist({
 });
 
 serwist.addEventListeners();
+
+// Push notification handler
+self.addEventListener("push", (event) => {
+  const promiseChain = (async (): Promise<void> => {
+    if (!event.data) {
+      await self.registration.showNotification("Link", {
+        badge: "/icon-192.png",
+        body: "新しい通知があります",
+        icon: "/icon-192.png",
+      });
+      return;
+    }
+
+    try {
+      const data = event.data.json() as {
+        badge?: string;
+        body: string;
+        icon?: string;
+        title: string;
+        url?: string;
+      };
+
+      await self.registration.showNotification(data.title, {
+        badge: data.badge || "/icon-192.png",
+        body: data.body,
+        data: { url: data.url || "/" },
+        icon: data.icon || "/icon-192.png",
+      });
+    } catch {
+      await self.registration.showNotification("Link", {
+        badge: "/icon-192.png",
+        body: "新しいメッセージがあります",
+        icon: "/icon-192.png",
+      });
+    }
+  })();
+
+  event.waitUntil(promiseChain);
+});
+
+// Notification click handler
+self.addEventListener("notificationclick", (event) => {
+  event.notification.close();
+
+  const url = (event.notification.data?.url as string) || "/";
+
+  event.waitUntil(
+    self.clients.matchAll({ includeUncontrolled: true, type: "window" }).then((clientList) => {
+      for (const client of clientList) {
+        if ("focus" in client) {
+          return client.focus();
+        }
+      }
+      if (self.clients.openWindow) {
+        return self.clients.openWindow(url);
+      }
+      return undefined;
+    }),
+  );
+});
