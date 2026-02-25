@@ -83,6 +83,8 @@ src/
 │   └── (chat)/               # チャットルート (フルスクリーン)
 │       └── chat/[conversationId]/  # リアルタイムチャット + 通話
 ├── components/               # 共通コンポーネント
+│   ├── theme-provider.tsx    # next-themes ダークモード対応
+│   ├── theme-toggle.tsx      # テーマ切替UI（ライト/ダーク/自動）
 │   └── ui/                   # shadcn/ui (自動生成、編集禁止)
 ├── env.ts                    # 環境変数定義（型安全）
 ├── proxy.ts                  # ミドルウェア（認証セッション管理）
@@ -96,6 +98,9 @@ src/
     │   ├── send.ts            # web-push 送信ユーティリティ
     │   ├── actions.ts         # プッシュ購読管理 Server Actions
     │   └── push-subscription-manager.tsx  # クライアント側購読登録
+    ├── pwa/
+    │   ├── pwa-install-button.tsx  # PWAインストールボタン (use-pwa)
+    │   └── pwa-prompt.tsx          # iOS PWAインストールプロンプト
     └── supabase/
         ├── client.ts         # ブラウザ用クライアント (Database型付き)
         ├── server.ts         # サーバー用クライアント (Database型付き)
@@ -198,11 +203,13 @@ const user = data?.claims;
 | id              | UUID (PK)   | メッセージID          |
 | conversation_id | UUID (FK)   | → conversations(id)   |
 | sender_id       | UUID (FK)   | → profiles(id)        |
-| content         | TEXT        | メッセージ本文         |
+| content         | TEXT        | メッセージ本文        |
+| read_at         | TIMESTAMPTZ | 既読日時（NULL=未読） |
 | created_at      | TIMESTAMPTZ | 送信日時              |
 
-- RLS: 参加者のみ参照可、自分のみ送信可
-- Realtime 有効
+- RLS: 参加者のみ参照可、自分のみ送信可、自分宛てメッセージの read_at のみ更新可
+- Realtime 有効（INSERT + UPDATE）
+- `get_unread_counts()` RPC: 全会話の未読数を一括取得
 
 ### call_sessions テーブル
 
