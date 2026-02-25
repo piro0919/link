@@ -2,6 +2,7 @@
 
 import { headers } from "next/headers";
 import { redirect } from "next/navigation";
+import { getTranslations } from "next-intl/server";
 import { env } from "@/env";
 import { createClient } from "@/lib/supabase/server";
 
@@ -14,6 +15,7 @@ export async function signInWithEmail(
   formData: FormData,
 ): Promise<EmailLoginState> {
   const supabase = await createClient();
+  const t = await getTranslations("Login");
 
   const email = formData.get("email") as string;
   const password = formData.get("password") as string;
@@ -21,7 +23,7 @@ export async function signInWithEmail(
   const { error } = await supabase.auth.signInWithPassword({ email, password });
 
   if (error) {
-    return { error: "メールアドレスまたはパスワードが正しくありません" };
+    return { error: t("invalidCredentials") };
   }
 
   redirect("/");

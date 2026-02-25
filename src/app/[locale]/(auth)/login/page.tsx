@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { getTranslations, setRequestLocale } from "next-intl/server";
 import type { ReactNode } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -6,17 +7,26 @@ import { Separator } from "@/components/ui/separator";
 import { DevLoginForm } from "./_components/dev-login-form";
 import { signInWithGoogle } from "./actions";
 
-export const metadata: Metadata = {
-  title: "ログイン",
-};
+export async function generateMetadata(): Promise<Metadata> {
+  const t = await getTranslations("Login");
+  return { title: t("title") };
+}
 
-export default function LoginPage(): ReactNode {
+export default async function LoginPage({
+  params,
+}: {
+  params: Promise<{ locale: string }>;
+}): Promise<ReactNode> {
+  const { locale } = await params;
+  setRequestLocale(locale);
+  const t = await getTranslations("Login");
+
   return (
     <div className="flex min-h-svh items-center justify-center bg-background p-4">
       <Card className="w-full max-w-sm">
         <CardHeader className="text-center">
           <CardTitle className="text-2xl font-bold">Link</CardTitle>
-          <CardDescription>アカウントにログイン</CardDescription>
+          <CardDescription>{t("subtitle")}</CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
           <form action={signInWithGoogle}>
@@ -39,7 +49,7 @@ export default function LoginPage(): ReactNode {
                   fill="#EA4335"
                 />
               </svg>
-              Googleでログイン
+              {t("googleLogin")}
             </Button>
           </form>
 
